@@ -1,40 +1,208 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <title>App Básica</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      padding: 20px;
-      background: #f0f0f0;
-    }
-    form {
-      background: #fff;
-      padding: 20px;
-      border-radius: 10px;
-    }
-    input, button {
-      display: block;
-      width: 100%;
-      margin-top: 10px;
-      padding: 10px;
-      font-size: 16px;
-    }
-    .success {
-      color: green;
-      margin-top: 10px;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cambiador de Color Avanzado</title>
+
+    <!-- ================== CSS MEJORADO ================== -->
+    <style>
+        /* Estilos generales del cuerpo de la página */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            /* Transición más específica y suave */
+            transition: background-color 0.8s ease, color 0.8s ease;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #f0f0f0; /* Color inicial */
+        }
+
+        /* Contenedor principal para centrar el contenido */
+        .container {
+            text-align: center;
+            background-color: rgba(255, 255, 255, 0.9); /* Fondo ligeramente transparente */
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+            max-width: 90%;
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+
+        /* Estilo para el título principal y el párrafo */
+        h1, p {
+            /* Añadimos transición para que el cambio de color sea suave */
+            transition: color 0.8s ease;
+        }
+
+        /* Estilo para mostrar el código de color actual */
+        .color-code {
+            background-color: #eee;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 20px;
+            font-weight: bold;
+            font-family: 'Courier New', Courier, monospace;
+            margin-top: 20px;
+            display: inline-block;
+            cursor: pointer; /* Indica que se puede hacer clic */
+            border: 2px solid transparent;
+            transition: border-color 0.3s ease;
+        }
+        
+        .color-code:hover {
+            border-color: #007bff;
+        }
+
+        /* Contenedor para los botones */
+        .button-group {
+            margin-top: 25px;
+            display: flex;
+            gap: 15px; /* Espacio entre botones */
+            justify-content: center;
+        }
+
+        /* Estilo general de los botones */
+        button {
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        /* Efecto al pasar el ratón */
+        button:hover {
+            transform: translateY(-2px); /* Eleva el botón ligeramente */
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+        }
+
+        /* Efecto al hacer clic */
+        button:active {
+            transform: translateY(1px);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        /* Colores específicos para cada botón */
+        #colorButton { background-color: #007bff; }
+        #colorButton:hover { background-color: #0056b3; }
+        #autoButton { background-color: #28a745; }
+        #autoButton:hover { background-color: #1e7e34; }
+
+    </style>
 </head>
 <body>
-  <h2>Formulario de Registro</h2>
-  <form id="miFormulario">
-    <input type="text" placeholder="Nombre" name="nombre" required>
-    <input type="email" placeholder="Correo electrónico" name="email" required>
-    <button type="submit">Enviar</button>
-    <div id="mensaje" class="success"></div>
+
+    <!-- ================== ESTRUCTURA HTML MEJORADA ================== -->
+    <div class="container">
+        <h1>Cambiador de Color Avanzado</h1>
+        <p>Presiona el botón o haz clic en el código para copiarlo.</p>
+        
+        <!-- NUEVO: Elemento para mostrar el código de color -->
+        <div id="colorDisplay" class="color-code">#f0f0f0</div>
+
+        <!-- NUEVO: Grupo de botones para una mejor organización -->
+        <div class="button-group">
+            <button id="colorButton">Cambiar Color</button>
+            <button id="autoButton">Iniciar Modo Automático</button>
+        </div>
+    </div>
+
+    <!-- ================== JAVASCRIPT MEJORADO ================== -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+
+    <script>
+        $(document).ready(function(){
+
+            var autoInterval = null; // Variable para controlar el intervalo del modo automático
+
+            // Función para generar un color hexadecimal aleatorio
+            function getRandomColor() {
+                var letters = '0123456789ABCDEF';
+                var color = '#';
+                for (var i = 0; i < 6; i++) {
+                    color += letters[Math.floor(Math.random() * 16)];
+                }
+                return color;
+            }
+
+            /**
+             * NUEVO: Función para determinar si el texto debe ser oscuro o claro
+             * basado en el brillo (luminancia) del color de fondo.
+             */
+            function getContrastColor(hexColor) {
+                // Quitar el '#' del inicio
+                var cleanHex = hexColor.replace('#', '');
+                
+                // Convertir hex a RGB
+                var r = parseInt(cleanHex.substring(0, 2), 16);
+                var g = parseInt(cleanHex.substring(2, 4), 16);
+                var b = parseInt(cleanHex.substring(4, 6), 16);
+                
+                // Fórmula de luminancia YIQ
+                var yiq = ((r * 299) + (g * 587) + (b * 114)) / 1000;
+                
+                // Devolver negro para fondos claros y blanco para fondos oscuros
+                return (yiq >= 128) ? '#333' : '#FFF';
+            }
+            
+            // Función principal para cambiar el color
+            function changeColor() {
+                var newColor = getRandomColor();
+                var contrastColor = getContrastColor(newColor);
+                
+                // Cambiamos el color de fondo del body
+                $("body").css("background-color", newColor);
+
+                // NUEVO: Cambiamos el color del texto para asegurar el contraste
+                $(".container h1, .container p").css("color", contrastColor);
+                
+                // NUEVO: Mostramos el nuevo código de color en la pantalla
+                $("#colorDisplay").text(newColor).css("color", contrastColor);
+            }
+
+            // Detectamos el evento 'click' en el botón principal
+            $("#colorButton").click(changeColor);
+
+            /**
+             * NUEVO: Lógica para el modo automático
+             */
+            $("#autoButton").click(function(){
+                if (autoInterval) {
+                    // Si el intervalo está activo, lo detenemos
+                    clearInterval(autoInterval);
+                    autoInterval = null;
+                    $(this).text("Iniciar Modo Automático").css('background-color', '#28a745');
+                } else {
+                    // Si no está activo, lo iniciamos para que cambie de color cada 2 segundos
+                    autoInterval = setInterval(changeColor, 2000);
+                    $(this).text("Detener Modo Automático").css('background-color', '#dc3545'); // Cambia a color rojo
+                }
+            });
+
+            /**
+             * NUEVO: Funcionalidad para copiar el color al portapapeles
+             */
+            $("#colorDisplay").click(function(){
+                var colorToCopy = $(this).text();
+                navigator.clipboard.writeText(colorToCopy).then(function() {
+                    // Feedback visual temporal
+                    alert('Color ' + colorToCopy + ' copiado al portapapeles!');
+                }, function(err) {
+                    console.error('Error al copiar el texto: ', err);
+                });
+            });
+
+        });
+    </script>
+
+</body>
+</html>    <div id="mensaje" class="success"></div>
   </form>
 
   <script>
