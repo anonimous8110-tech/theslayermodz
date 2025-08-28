@@ -3,214 +3,251 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cambiador de Color Avanzado</title>
-
-    <!-- ================== CSS MEJORADO ================== -->
+    <title>Creador de APK a partir de HTML</title>
+    
+    <!-- CSS incrustado directamente en el HTML -->
     <style>
-        /* Estilos generales del cuerpo de la página */
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            /* Transición más específica y suave */
-            transition: background-color 0.8s ease, color 0.8s ease;
-            margin: 0;
+            background-color: #f4f7f6;
+            color: #333;
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            background-color: #f0f0f0; /* Color inicial */
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
         }
 
-        /* Contenedor principal para centrar el contenido */
         .container {
-            text-align: center;
-            background-color: rgba(255, 255, 255, 0.9); /* Fondo ligeramente transparente */
-            padding: 40px;
+            background-color: #fff;
+            padding: 2rem 3rem;
             border-radius: 12px;
-            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
-            max-width: 90%;
-            border: 1px solid rgba(0,0,0,0.05);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 550px;
         }
 
-        /* Estilo para el título principal y el párrafo */
-        h1, p {
-            /* Añadimos transición para que el cambio de color sea suave */
-            transition: color 0.8s ease;
+        header {
+            text-align: center;
+            margin-bottom: 2rem;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 1rem;
         }
 
-        /* Estilo para mostrar el código de color actual */
-        .color-code {
-            background-color: #eee;
-            padding: 10px 20px;
+        h1 {
+            color: #007BFF;
+            margin: 0;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        input[type="text"], input[type="file"] {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ccc;
             border-radius: 8px;
-            font-size: 20px;
-            font-weight: bold;
-            font-family: 'Courier New', Courier, monospace;
-            margin-top: 20px;
-            display: inline-block;
-            cursor: pointer; /* Indica que se puede hacer clic */
-            border: 2px solid transparent;
-            transition: border-color 0.3s ease;
+            box-sizing: border-box;
+            transition: border-color 0.3s, box-shadow 0.3s;
         }
         
-        .color-code:hover {
-            border-color: #007bff;
+        input[type="text"]:focus, input[type="file"]:focus {
+            border-color: #007BFF;
+            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
+            outline: none;
         }
 
-        /* Contenedor para los botones */
-        .button-group {
-            margin-top: 25px;
-            display: flex;
-            gap: 15px; /* Espacio entre botones */
-            justify-content: center;
+        small {
+            color: #666;
+            font-size: 0.85rem;
+            margin-top: 5px;
+            display: block;
         }
 
-        /* Estilo general de los botones */
-        button {
+        button, .button {
+            display: inline-block;
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(45deg, #007BFF, #0056b3);
             color: white;
             border: none;
-            padding: 15px 30px;
-            font-size: 16px;
             border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: bold;
             cursor: pointer;
-            transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            text-align: center;
+            text-decoration: none;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        button:hover, .button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 123, 255, 0.4);
         }
         
-        /* Efecto al pasar el ratón */
-        button:hover {
-            transform: translateY(-2px); /* Eleva el botón ligeramente */
-            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+        button:disabled {
+            background: #aaa;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
         }
 
-        /* Efecto al hacer clic */
-        button:active {
-            transform: translateY(1px);
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        .hidden {
+            display: none;
         }
 
-        /* Colores específicos para cada botón */
-        #colorButton { background-color: #007bff; }
-        #colorButton:hover { background-color: #0056b3; }
-        #autoButton { background-color: #28a745; }
-        #autoButton:hover { background-color: #1e7e34; }
+        #status-area {
+            text-align: center;
+            margin-top: 2rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid #eee;
+        }
 
+        .spinner {
+            border: 4px solid rgba(0,0,0,0.1);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border-left-color: #007BFF;
+            animation: spin 1s ease infinite;
+            margin: 1rem auto;
+        }
+
+        #download-link {
+            margin-top: 1rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
     </style>
 </head>
 <body>
 
-    <!-- ================== ESTRUCTURA HTML MEJORADA ================== -->
     <div class="container">
-        <h1>Cambiador de Color Avanzado</h1>
-        <p>Presiona el botón o haz clic en el código para copiarlo.</p>
-        
-        <!-- NUEVO: Elemento para mostrar el código de color -->
-        <div id="colorDisplay" class="color-code">#f0f0f0</div>
+        <header>
+            <h1>Crea tu App Android (APK)</h1>
+            <p>Sube tu proyecto web (HTML, CSS, JS) en un único archivo .zip para convertirlo.</p>
+        </header>
 
-        <!-- NUEVO: Grupo de botones para una mejor organización -->
-        <div class="button-group">
-            <button id="colorButton">Cambiar Color</button>
-            <button id="autoButton">Iniciar Modo Automático</button>
+        <main>
+            <form id="apk-form" enctype="multipart/form-data">
+                <div class="form-group">
+                    <label for="appName">Nombre de la Aplicación:</label>
+                    <input type="text" id="appName" name="appName" placeholder="Ej: Mi App Increíble" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="packageId">ID del Paquete (Package ID):</label>
+                    <input type="text" id="packageId" name="packageId" placeholder="Ej: com.misitio.miapp" pattern="[a-z][a-z0-9_]*(\.[a-z0-9_]+)+[a-z0-9_]$" required>
+                    <small>Formato: com.empresa.nombreapp (solo minúsculas, números, puntos)</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="zipFile">Tu proyecto (.zip):</label>
+                    <input type="file" id="zipFile" name="zipFile" accept=".zip" required>
+                    <small>El archivo .zip debe contener un <strong>index.html</strong> en la raíz.</small>
+                </div>
+
+                <button type="submit" id="submit-button">Crear APK</button>
+            </form>
+        </main>
+
+        <div id="status-area" class="hidden">
+            <h2>Estado de la Creación</h2>
+            <div class="spinner" id="spinner"></div>
+            <p id="status-message">Enviando archivos al servidor...</p>
+            <a id="download-link" class="button hidden" href="#" download>¡Descargar tu APK!</a>
         </div>
+
     </div>
 
-    <!-- ================== JAVASCRIPT MEJORADO ================== -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-
+    <!-- JavaScript incrustado directamente en el HTML -->
     <script>
-        $(document).ready(function(){
-
-            var autoInterval = null; // Variable para controlar el intervalo del modo automático
-
-            // Función para generar un color hexadecimal aleatorio
-            function getRandomColor() {
-                var letters = '0123456789ABCDEF';
-                var color = '#';
-                for (var i = 0; i < 6; i++) {
-                    color += letters[Math.floor(Math.random() * 16)];
-                }
-                return color;
-            }
-
-            /**
-             * NUEVO: Función para determinar si el texto debe ser oscuro o claro
-             * basado en el brillo (luminancia) del color de fondo.
-             */
-            function getContrastColor(hexColor) {
-                // Quitar el '#' del inicio
-                var cleanHex = hexColor.replace('#', '');
-                
-                // Convertir hex a RGB
-                var r = parseInt(cleanHex.substring(0, 2), 16);
-                var g = parseInt(cleanHex.substring(2, 4), 16);
-                var b = parseInt(cleanHex.substring(4, 6), 16);
-                
-                // Fórmula de luminancia YIQ
-                var yiq = ((r * 299) + (g * 587) + (b * 114)) / 1000;
-                
-                // Devolver negro para fondos claros y blanco para fondos oscuros
-                return (yiq >= 128) ? '#333' : '#FFF';
-            }
+        document.addEventListener('DOMContentLoaded', () => {
+            const form = document.getElementById('apk-form');
+            const submitButton = document.getElementById('submit-button');
+            const statusArea = document.getElementById('status-area');
+            const statusMessage = document.getElementById('status-message');
+            const spinner = document.getElementById('spinner');
+            const downloadLink = document.getElementById('download-link');
             
-            // Función principal para cambiar el color
-            function changeColor() {
-                var newColor = getRandomColor();
-                var contrastColor = getContrastColor(newColor);
+            // ¡IMPORTANTE! Cambia esta URL por la dirección de tu servidor backend.
+            const BACKEND_URL = 'http://localhost:3000/create-apk';
+
+            form.addEventListener('submit', async (event) => {
+                event.preventDefault(); // Evita el envío tradicional del formulario
+
+                const appName = document.getElementById('appName').value;
+                const packageId = document.getElementById('packageId').value;
+                const zipFile = document.getElementById('zipFile').files[0];
+
+                if (!appName || !packageId || !zipFile) {
+                    alert('Por favor, completa todos los campos.');
+                    return;
+                }
                 
-                // Cambiamos el color de fondo del body
-                $("body").css("background-color", newColor);
+                if (!zipFile.name.endsWith('.zip')) {
+                    alert('Por favor, sube un archivo con extensión .zip');
+                    return;
+                }
 
-                // NUEVO: Cambiamos el color del texto para asegurar el contraste
-                $(".container h1, .container p").css("color", contrastColor);
-                
-                // NUEVO: Mostramos el nuevo código de color en la pantalla
-                $("#colorDisplay").text(newColor).css("color", contrastColor);
-            }
+                // Prepara los datos del formulario para el envío
+                const formData = new FormData();
+                formData.append('appName', appName);
+                formData.append('packageId', packageId);
+                formData.append('zipFile', zipFile);
 
-            // Detectamos el evento 'click' en el botón principal
-            $("#colorButton").click(changeColor);
+                // Actualiza la interfaz para mostrar el estado de carga
+                submitButton.disabled = true;
+                submitButton.textContent = 'Creando...';
+                statusArea.classList.remove('hidden');
+                spinner.classList.remove('hidden');
+                downloadLink.classList.add('hidden');
+                statusMessage.textContent = '1/3: Enviando archivos al servidor...';
 
-            /**
-             * NUEVO: Lógica para el modo automático
-             */
-            $("#autoButton").click(function(){
-                if (autoInterval) {
-                    // Si el intervalo está activo, lo detenemos
-                    clearInterval(autoInterval);
-                    autoInterval = null;
-                    $(this).text("Iniciar Modo Automático").css('background-color', '#28a745');
-                } else {
-                    // Si no está activo, lo iniciamos para que cambie de color cada 2 segundos
-                    autoInterval = setInterval(changeColor, 2000);
-                    $(this).text("Detener Modo Automático").css('background-color', '#dc3545'); // Cambia a color rojo
+                try {
+                    statusMessage.textContent = '2/3: El servidor está compilando la APK. Esto puede tardar varios minutos...';
+                    
+                    const response = await fetch(BACKEND_URL, {
+                        method: 'POST',
+                        body: formData,
+                    });
+
+                    const result = await response.json();
+
+                    if (response.ok) {
+                        statusMessage.textContent = '3/3: ¡APK creada con éxito!';
+                        spinner.classList.add('hidden');
+                        downloadLink.href = result.downloadUrl; // URL de descarga que envía el servidor
+                        downloadLink.setAttribute('download', `${appName.replace(/\s+/g, '-')}.apk`); // Sugiere un nombre de archivo
+                        downloadLink.classList.remove('hidden');
+                    } else {
+                        throw new Error(result.message || 'Ocurrió un error desconocido en el servidor.');
+                    }
+
+                } catch (error) {
+                    // Manejo de errores de red o del servidor
+                    console.error('Error en la petición:', error);
+                    statusMessage.textContent = `Error: ${error.message}. Revisa la consola para más detalles.`;
+                    spinner.classList.add('hidden');
+                } finally {
+                    // Restablece el botón
+                    submitButton.disabled = false;
+                    submitButton.textContent = 'Crear APK';
                 }
             });
-
-            /**
-             * NUEVO: Funcionalidad para copiar el color al portapapeles
-             */
-            $("#colorDisplay").click(function(){
-                var colorToCopy = $(this).text();
-                navigator.clipboard.writeText(colorToCopy).then(function() {
-                    // Feedback visual temporal
-                    alert('Color ' + colorToCopy + ' copiado al portapapeles!');
-                }, function(err) {
-                    console.error('Error al copiar el texto: ', err);
-                });
-            });
-
         });
     </script>
-
 </body>
-</html>    <div id="mensaje" class="success"></div>
-  </form>
-
-  <script>
-    document.getElementById('miFormulario').addEventListener('submit', function(e) {
-      e.preventDefault();
-      document.getElementById('mensaje').textContent = 'Formulario enviado con éxito ✅';
-      this.reset();
-    });
-  </script>
-</body>
-</html>
+                    </html>
