@@ -1,40 +1,266 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>ESTAFAS</title>
+  <meta charset="UTF-8">
+  <title>Optimizador Avanzado de APK (Cliente-Side)</title>
   <style>
     body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
       margin: 0;
-      padding: 0;
-      font-family: Arial, sans-serif;
-      background: #0a0a0f;
-      color: #fff;
-    }
-    #particles-js {
-      position: absolute;
-      width: 100%;
-      height: 100%;
-      z-index: 0;
-    }
-    .painel, .login-box {
-      position: relative;
-      z-index: 1;
-      background: #1a1a1f;
-      width: 320px;
-      margin: 80px auto;
       padding: 20px;
-      border-radius: 12px;
-      text-align: center;
-      box-shadow: 0 0 15px #000;
-    }
-    .login-box { display: none; }
-    .painel { display: block; }
-    h2 { margin-bottom: 15px; font-size: 16px; }
-    .tabs {
+      background: #f0f2f5;
       display: flex;
-      justify-content: space-between;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      color: #333;
+    }
+    .container {
+      background: #fff;
+      padding: 30px 40px;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+      max-width: 600px;
+      width: 100%;
+      text-align: center;
+      border: 1px solid #ddd;
+    }
+    h2 {
+      color: #1a73e8;
+      margin-bottom: 20px;
+    }
+    .upload-area {
+      border: 2px dashed #1a73e8;
+      padding: 40px 20px;
+      border-radius: 8px;
+      background: #f8f9fa;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    .upload-area:hover {
+      background: #e9f1ff;
+    }
+    .upload-area p {
+      margin: 0;
+      font-size: 18px;
+      color: #555;
+    }
+    .upload-area span {
+      font-size: 14px;
+      color: #777;
+    }
+    input[type=file] {
+      display: none;
+    }
+    button {
+      padding: 12px 25px;
+      font-size: 16px;
+      border: none;
+      background: #1a73e8;
+      color: white;
+      border-radius: 8px;
+      cursor: pointer;
+      margin-top: 20px;
+      transition: background 0.3s, box-shadow 0.3s;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    button:hover {
+      background: #1865c9;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+    }
+    button:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+    .output {
+      margin-top: 25px;
+      font-size: 15px;
+      line-height: 1.6;
+      text-align: left;
+    }
+    .status {
+      padding: 10px;
+      border-radius: 6px;
+      margin-bottom: 10px;
+    }
+    .status.info { background-color: #e9f1ff; color: #1865c9; }
+    .status.success { background-color: #e6f4ea; color: #1e8e3e; }
+    .status.error { background-color: #fce8e6; color: #d93025; }
+    .warning {
+        background-color: #feefc3;
+        color: #6d4f05;
+        padding: 15px;
+        border-radius: 8px;
+        margin-top: 20px;
+        font-size: 14px;
+        border: 1px solid #f9ab00;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Optimizador de Recursos APK</h2>
+    
+    <div id="uploadArea" class="upload-area">
+      <p>Arrastra y suelta tu archivo .apk aquí</p>
+      <span>o haz clic para seleccionar un archivo</span>
+    </div>
+    <input type="file" id="apkFile" accept=".apk">
+    
+    <button id="compressBtn" disabled>Optimizar y Descargar (.zip)</button>
+    
+    <div class="output" id="output"></div>
+
+    <div class="warning">
+      <strong>Importante:</strong> Esta herramienta optimiza las imágenes dentro de tu APK y lo empaqueta como un archivo <strong>.zip</strong>. El resultado <strong>NO</strong> es un archivo .apk instalable. Para finalizar el proceso se requiere firmar y alinear el paquete con herramientas de desarrollo de Android.
+    </div>
+  </div>
+
+  <!-- Librerías JS cargadas desde CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.11.0/jszip.min.js"></script>
+  <!-- pngquant.js compilado a JS. Es grande porque es una herramienta potente. -->
+  <script src="https://cdn.jsdelivr.net/gh/psych0der/pngquantjs/dist/pngquant.js"></script>
+
+  <script>
+    // Se envuelve todo en DOMContentLoaded para asegurar que el HTML y las librerías estén listos
+    document.addEventListener('DOMContentLoaded', () => {
+      const apkInput = document.getElementById('apkFile');
+      const compressBtn = document.getElementById('compressBtn');
+      const output = document.getElementById('output');
+      const uploadArea = document.getElementById('uploadArea');
+
+      let apkFile = null;
+
+      // Funcionalidad de Drag and Drop
+      uploadArea.addEventListener('click', () => apkInput.click());
+      uploadArea.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        uploadArea.style.background = '#e9f1ff';
+      });
+      uploadArea.addEventListener('dragleave', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        uploadArea.style.background = '#f8f9fa';
+      });
+      uploadArea.addEventListener('drop', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        uploadArea.style.background = '#f8f9fa';
+        const files = e.dataTransfer.files;
+        if (files.length > 0) {
+          handleFile(files[0]);
+        }
+      });
+      apkInput.addEventListener('change', e => handleFile(e.target.files[0]));
+
+      function handleFile(file) {
+        if (!file) return;
+
+        const sizeMB = file.size / (1024 * 1024);
+        if (sizeMB > 200) {
+          log('APK demasiado grande. Máximo permitido: 200 MB.', 'error');
+          compressBtn.disabled = true;
+        } else if (!file.name.toLowerCase().endsWith('.apk')) {
+          log('Por favor, selecciona un archivo .apk válido.', 'error');
+          compressBtn.disabled = true;
+        } else {
+          log(`Archivo cargado: <strong>${file.name}</strong> (${sizeMB.toFixed(2)} MB). Listo para optimizar.`, 'success');
+          apkFile = file;
+          compressBtn.disabled = false;
+        }
+      }
+
+      function log(message, type = 'info') {
+          output.innerHTML = `<div class="status ${type}">${message}</div>` + (type !== 'info' ? output.innerHTML : '');
+      }
+
+      compressBtn.addEventListener('click', async () => {
+        if (!apkFile) return;
+        
+        // **CORRECCIÓN:** Verificar si las librerías existen antes de usarlas
+        if (typeof JSZip === 'undefined' || typeof pngquant === 'undefined') {
+            log('Error: Las librerías externas no se cargaron correctamente. Revisa tu conexión a internet o posibles bloqueadores de scripts y recarga la página.', 'error');
+            return;
+        }
+
+        compressBtn.disabled = true;
+        output.innerHTML = ''; // Limpiar logs
+        log('Iniciando proceso de optimización... ⏳');
+
+        try {
+          const originalZip = await JSZip.loadAsync(apkFile);
+          const newZip = new JSZip();
+          let optimizedImageCount = 0;
+          let totalSavings = 0;
+
+          const filesToProcess = Object.keys(originalZip.files);
+          log(`Analizando ${filesToProcess.length} archivos dentro del APK...`);
+
+          for (const filename of filesToProcess) {
+            const file = originalZip.files[filename];
+            
+            if (!file.dir && filename.toLowerCase().endsWith('.png')) {
+              const originalData = await file.async('uint8array');
+              
+              try {
+                const optimizedData = pngquant(originalData);
+                const savings = originalData.length - optimizedData.length;
+
+                if (savings > 0) {
+                    totalSavings += savings;
+                    optimizedImageCount++;
+                    newZip.file(filename, optimizedData);
+                    console.log(`Optimizado: ${filename} (Ahorro: ${(savings/1024).toFixed(2)} KB)`);
+                } else {
+                    newZip.file(filename, originalData);
+                }
+              } catch(e) {
+                  console.error(`No se pudo optimizar ${filename}: ${e}. Usando el original.`);
+                  newZip.file(filename, await file.async('blob'));
+              }
+            } else {
+              newZip.file(filename, await file.async('blob'));
+            }
+          }
+          
+          if(optimizedImageCount > 0) {
+              log(`Optimización de imágenes completada. Se mejoraron <strong>${optimizedImageCount}</strong> imágenes con un ahorro total de <strong>${(totalSavings / (1024*1024)).toFixed(2)} MB</strong>.`, 'success');
+          } else {
+              log('No se encontraron imágenes PNG que pudieran ser optimizadas.', 'info');
+          }
+
+          log('Generando archivo .zip final...');
+          const compressedBlob = await newZip.generateAsync({
+            type: "blob",
+            compression: "DEFLATE",
+            compressionOptions: {
+              level: 9
+            }
+          });
+
+          const link = document.createElement('a');
+          link.href = URL.createObjectURL(compressedBlob);
+          link.download = apkFile.name.replace(/\.apk$/i, '_optimized.zip');
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          URL.revokeObjectURL(link.href);
+
+          log(`¡Listo! El archivo <strong>${link.download}</strong> se está descargando. Tamaño final: <strong>${(compressedBlob.size/(1024*1024)).toFixed(2)} MB</strong>`, 'success');
+
+        } catch (err) {
+          log(`Error durante el proceso: ${err.message}`, 'error');
+          console.error(err);
+        } finally {
+          compressBtn.disabled = false;
+        }
+      });
+    });
+  </script>
+</body>
+</html>      justify-content: space-between;
       margin-bottom: 10px;
     }
     .tab-button {
